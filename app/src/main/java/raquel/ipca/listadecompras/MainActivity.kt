@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
@@ -34,26 +35,24 @@ class MainActivity : AppCompatActivity() {
                 editTextItemName.text.toString(),"", 0)
             lifecycleScope.launch(Dispatchers.IO) {
                 AppDatabase.getDatabase(this@MainActivity)?.itemDao()?.insert(item)
-                getItemsFromDB()
+
             }
 
         }
         listViewItems.adapter=itemAdapter
 
 
-        getItemsFromDB()
-    }
-
-    fun getItemsFromDB() {
-        lifecycleScope.launch(Dispatchers.IO){
-            items = AppDatabase.getDatabase(this@MainActivity)
-                ?.itemDao()
-                ?.getAll() as ArrayList<Item>
-            lifecycleScope.launch(Dispatchers.Main) {
+        AppDatabase.getDatabase(this)?.itemDao()?.getAll()?.observe(
+            this, Observer {
+                items = it as  ArrayList<Item>
                 itemAdapter.notifyDataSetChanged()
             }
-        }
+        )
+
+
     }
+
+
 
     inner class ItemsAdapter : BaseAdapter() {
         override fun getCount(): Int {
@@ -92,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                     AppDatabase.getDatabase(this@MainActivity)
                         ?.itemDao()
                         ?.delete(items[p0])
-                    getItemsFromDB()
+
                 }
             }
 

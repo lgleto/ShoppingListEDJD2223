@@ -1,5 +1,6 @@
 package raquel.ipca.listadecompras
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Entity
@@ -28,10 +29,10 @@ class Item {
 interface ItemDao {
 
     @Query("SELECT * FROM item")
-    fun getAll() : List<Item>
+    fun getAll() : LiveData<List<Item>>
 
     @Query("SELECT * FROM item WHERE id =:id")
-    fun getItemById(id : String) : Item
+    fun getItemById(id : String) : LiveData<Item>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(item: Item)
