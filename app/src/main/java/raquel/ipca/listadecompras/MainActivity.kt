@@ -11,11 +11,18 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
+
     var items = arrayListOf<Item>()
+
     val itemAdapter = ItemsAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,11 +30,29 @@ class MainActivity : AppCompatActivity() {
         val editTextItemName = findViewById<EditText>(R.id.editTextItemName)
         val buttonAdd = findViewById<FloatingActionButton>(R.id.buttonAdd)
         buttonAdd.setOnClickListener {
-            val item = Item (editTextItemName.text.toString(),"", 0)
-          items.add(item)
-            itemAdapter.notifyDataSetChanged()
+            val item = Item ( UUID.randomUUID().toString(),
+                editTextItemName.text.toString(),"", 0)
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppDatabase.getDatabase(this@MainActivity)?.itemDao()?.insert(item)
+                getItemsFromDB()
+            }
+
         }
         listViewItems.adapter=itemAdapter
+
+
+        getItemsFromDB()
+    }
+
+    fun getItemsFromDB() {
+        lifecycleScope.launch(Dispatchers.IO){
+            items = AppDatabase.getDatabase(this@MainActivity)
+                ?.itemDao()
+                ?.getAll() as ArrayList<Item>
+            lifecycleScope.launch(Dispatchers.Main) {
+                itemAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     inner class ItemsAdapter : BaseAdapter() {
@@ -62,8 +87,13 @@ class MainActivity : AppCompatActivity() {
                 items[p0].counter=textViewNumber.text.toString().toInt()
             }
             buttonTrash.setOnClickListener {
-                items.remove(items[p0])
-                itemAdapter.notifyDataSetChanged()
+                //items.remove(items[p0])
+                lifecycleScope.launch (Dispatchers.IO){
+                    AppDatabase.getDatabase(this@MainActivity)
+                        ?.itemDao()
+                        ?.delete(items[p0])
+                    getItemsFromDB()
+                }
             }
 
             textVewItemName.text=items[p0].name
