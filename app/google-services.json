@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "756617528788",
+    "project_id": "shoppinglist-e4668",
+    "storage_bucket": "shoppinglist-e4668.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756617528788:android:dec78bf7a4156524b10241",
+        "android_client_info": {
+          "package_name": "raquel.ipca.listadecompras"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756617528788-9cr9m7plvbpdjl1v5rs3mkqumqdp4672.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7fB0bvyteZ3KWa8EygkkXo6kGGutKZbU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756617528788-9cr9m7plvbpdjl1v5rs3mkqumqdp4672.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
