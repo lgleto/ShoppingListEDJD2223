@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 
 @Entity
 class Item {
@@ -36,6 +37,9 @@ interface ItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(item: Item)
+
+    @Update
+    fun update(item: Item)
 
     @Delete
     fun delete(item: Item)

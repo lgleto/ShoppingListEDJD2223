@@ -80,10 +80,20 @@ class MainActivity : AppCompatActivity() {
             buttonAdd.setOnClickListener {
                 textViewNumber.text = (textViewNumber.text.toString().toInt()+1).toString()
                 items[p0].counter=textViewNumber.text.toString().toInt()
+                lifecycleScope.launch(Dispatchers.IO){
+                    AppDatabase.getDatabase(this@MainActivity)
+                        ?.itemDao()
+                        ?.update(items[p0])
+                }
             }
             buttonMinus.setOnClickListener {
                 textViewNumber.text = (textViewNumber.text.toString().toInt()-1).toString()
                 items[p0].counter=textViewNumber.text.toString().toInt()
+                lifecycleScope.launch(Dispatchers.IO){
+                    AppDatabase.getDatabase(this@MainActivity)
+                        ?.itemDao()
+                        ?.update(items[p0])
+                }
             }
             buttonTrash.setOnClickListener {
                 //items.remove(items[p0])
