@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
 
     val itemAdapter = ItemsAdapter()
 
+    val db = Firebase.firestore
+    val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,8 +38,8 @@ class MainActivity : AppCompatActivity() {
             val item = Item ( UUID.randomUUID().toString(),
                 editTextItemName.text.toString(),"", 0)
 
-            val db = Firebase.firestore
-            val userId = FirebaseAuth.getInstance().currentUser!!.uid
+
+
 
             db.collection("users")
                 .document(userId)
@@ -52,7 +55,23 @@ class MainActivity : AppCompatActivity() {
         listViewItems.adapter=itemAdapter
 
 
+        db.collection("users")
+            .document(userId)
+            .collection("shopping_list")
+            .addSnapshotListener { value, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    return@addSnapshotListener
+                }
 
+                items.clear()
+                for (doc in value!!) {
+                    val item = Item.fromQueryDoc(doc)
+                    items.add(item)
+                }
+
+                itemAdapter.notifyDataSetChanged()
+            }
 
 
     }
@@ -85,12 +104,12 @@ class MainActivity : AppCompatActivity() {
 
             buttonAdd.setOnClickListener {
                 textViewNumber.text = (textViewNumber.text.toString().toInt()+1).toString()
-                items[p0].counter=textViewNumber.text.toString().toInt()
+                items[p0].counter=textViewNumber.text.toString().toLong()
 
             }
             buttonMinus.setOnClickListener {
                 textViewNumber.text = (textViewNumber.text.toString().toInt()-1).toString()
-                items[p0].counter=textViewNumber.text.toString().toInt()
+                items[p0].counter=textViewNumber.text.toString().toLong()
 
             }
             buttonTrash.setOnClickListener {
