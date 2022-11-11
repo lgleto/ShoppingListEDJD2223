@@ -8,15 +8,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
@@ -35,11 +33,8 @@ class MainActivity : AppCompatActivity() {
         val editTextItemName = findViewById<EditText>(R.id.editTextItemName)
         val buttonAdd = findViewById<FloatingActionButton>(R.id.buttonAdd)
         buttonAdd.setOnClickListener {
-            val item = Item ( UUID.randomUUID().toString(),
+            val item = Item ( "",
                 editTextItemName.text.toString(),"", 0)
-
-
-
 
             db.collection("users")
                 .document(userId)
@@ -73,8 +68,29 @@ class MainActivity : AppCompatActivity() {
                 itemAdapter.notifyDataSetChanged()
             }
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
 
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+
+            Log.d(TAG, token)
+            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+
+            db.collection("users")
+                .document(userId)
+                .collection("tokens")
+                .document(token).set(hashMapOf(
+                    "token" to token
+                ))
+        })
     }
+
 
 
 
@@ -103,18 +119,28 @@ class MainActivity : AppCompatActivity() {
             textViewNumber.text = items[p0].counter.toString()
 
             buttonAdd.setOnClickListener {
-                textViewNumber.text = (textViewNumber.text.toString().toInt()+1).toString()
-                items[p0].counter=textViewNumber.text.toString().toLong()
+                val item  = items[p0]
+                item.counter = (item.counter?:0) + 1
+                db.collection("users")
+                    .document(userId)
+                    .collection("shopping_list")
+                    .document(item.id).set(item.toHashMap())
 
             }
             buttonMinus.setOnClickListener {
-                textViewNumber.text = (textViewNumber.text.toString().toInt()-1).toString()
-                items[p0].counter=textViewNumber.text.toString().toLong()
+                items[p0].counter = (items[p0].counter?:0) - 1
+                db.collection("users")
+                    .document(userId)
+                    .collection("shopping_list")
+                    .document(items[p0].id).set(items[p0].toHashMap())
 
             }
             buttonTrash.setOnClickListener {
                 //items.remove(items[p0])
-
+                db.collection("users")
+                    .document(userId)
+                    .collection("shopping_list")
+                    .document(items[p0].id).delete()
             }
 
             textVewItemName.text=items[p0].name

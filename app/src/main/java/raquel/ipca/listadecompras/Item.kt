@@ -28,7 +28,7 @@ class Item {
     companion object {
         fun fromQueryDoc( documentSnapshot: DocumentSnapshot) : Item {
             return Item(
-                documentSnapshot["id"         ] as String,
+                documentSnapshot.id,
                 documentSnapshot["name"       ] as String?,
                 documentSnapshot["description"] as String?,
                 documentSnapshot["counter"    ] as Long?,
