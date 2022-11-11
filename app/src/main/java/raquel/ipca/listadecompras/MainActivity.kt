@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,9 @@ import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +35,19 @@ class MainActivity : AppCompatActivity() {
             val item = Item ( UUID.randomUUID().toString(),
                 editTextItemName.text.toString(),"", 0)
 
+            val db = Firebase.firestore
+            val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
+            db.collection("users")
+                .document(userId)
+                .collection("shopping_list")
+                .add(item.toHashMap())
+                .addOnSuccessListener { documentReference ->
+                    Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding document", e)
+                }
         }
         listViewItems.adapter=itemAdapter
 
@@ -87,6 +103,10 @@ class MainActivity : AppCompatActivity() {
             return rootView
         }
 
+    }
+
+    companion object {
+        const val  TAG = "MainActivity"
     }
 
 }

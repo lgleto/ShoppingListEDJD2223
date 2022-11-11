@@ -13,4 +13,13 @@ class Item {
         this.description = description
         this.counter = counter
     }
+
+    fun toHashMap() : HashMap<String, Any?>{
+        return hashMapOf(
+            "id"          to id          ,
+            "name"        to name        ,
+            "description" to description ,
+            "counter"     to counter     ,
+        )
+    }
 }
