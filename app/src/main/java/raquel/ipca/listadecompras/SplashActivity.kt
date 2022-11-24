@@ -3,6 +3,10 @@ package raquel.ipca.listadecompras
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
@@ -18,18 +22,32 @@ class SplashActivity : AppCompatActivity() {
         val auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
 
-        lifecycleScope.launch {
-            delay(2000)
-            launch {
+        val imageViewIcon = findViewById<ImageView>(R.id.imageViewIcon)
+        val animFadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+        val animPosition = AnimationUtils.loadAnimation(this, R.anim.postion)
+        imageViewIcon.startAnimation(animFadeIn)
+        animFadeIn.setAnimationListener(object : AnimationListener{
+            override fun onAnimationStart(p0: Animation?) {}
+            override fun onAnimationEnd(p0: Animation?) {
+                imageViewIcon.startAnimation(animPosition)
+            }
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+        animPosition.setAnimationListener(object : AnimationListener{
+            override fun onAnimationStart(p0: Animation?) {}
+            override fun onAnimationEnd(p0: Animation?) {
                 currentUser?.let {
                     startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                    finish()
+                    //finish()
                 }?:run{
                     startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-                    finish()
+                    overridePendingTransition(R.anim.anim_hold, R.anim.fade_in);
+                    //finish()
                 }
             }
-        }
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+
 
 
     }
